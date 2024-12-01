@@ -66,22 +66,23 @@ class XMPlaylistScraper():
             for i in album_data:
                 res = requests.get(f'https://xmplaylist.com/api/search?artistName={i.get("artist")}&trackName={i.get("track")}&timeAgo={total_seconds}', headers=headers)
                 data = res.json()
-                for sc in data.get('stationsCounts'):
-                    station_name = sc.get('name')
-                    if sc.get('name') not in known_channels:
-                        known_channels.append(sc.get('name'))
-                    if add_comparison:
-                        difference_name = sc.get('name') + '_Difference'
-                        if difference_name not in known_channels:
-                            known_channels.append(difference_name)
-                    i[sc.get('name')] = sc.get('value')
-                    if add_comparison:
-                        prev_record = [j for j in prev_json if j.get('track') == i.get('track')]
-                        if len(prev_record) == 1:
-                            prev_record = prev_record[0]
-                            keys = self.get_keys(prev_record)
-                            for k in keys:
-                                i[k + '_Difference'] = self.get_period_difference(i.get(k), prev_record.get(k))
+                if data.get('stationsCounts'):
+                    for sc in data.get('stationsCounts'):
+                        station_name = sc.get('name')
+                        if sc.get('name') not in known_channels:
+                            known_channels.append(sc.get('name'))
+                        if add_comparison:
+                            difference_name = sc.get('name') + '_Difference'
+                            if difference_name not in known_channels:
+                                known_channels.append(difference_name)
+                        i[sc.get('name')] = sc.get('value')
+                        if add_comparison:
+                            prev_record = [j for j in prev_json if j.get('track') == i.get('track')]
+                            if len(prev_record) == 1:
+                                prev_record = prev_record[0]
+                                keys = self.get_keys(prev_record)
+                                for k in keys:
+                                    i[k + '_Difference'] = self.get_period_difference(i.get(k), prev_record.get(k))
 
                 result.append(i)
 
